@@ -2,13 +2,17 @@ import React, { Component } from 'react';
 import { 
   View, 
   Text,
-  StyleSheet, 
-  WebView, 
+  StyleSheet,  
   Platform, 
+  WebView,
   ActivityIndicator,
-  Dimensions
+  Dimensions,
+  ScrollView,
+  RefreshControl,
+  Button
 } from 'react-native';
 import { ScreenOrientation } from 'expo'
+//import { WebView } from "react-native-webview";
 
 export default class MainActivity extends Component {
   constructor() {
@@ -44,13 +48,31 @@ export default class MainActivity extends Component {
   ErrorHandlerView() {
     return (
       <View style={ [styles.container, styles.vertical] }>
-        <Text>Что-то пошло не так...</Text>
+        <Text>Нет доступа к интернету. Проверьте работу интернета и попробуйте еще раз...</Text>
+        <Button title="Повторить попытку" onPress={() => { WebViewRef && WebViewRef.reload();}}/>
       </View>
     );
   }
   render() {
+    let webview;
     return (
+    <ScrollView
+        //bounces={false}
+        contentContainerStyle={{flex: 1}}
+        refreshControl={
+          <RefreshControl
+            title='Обновление'
+            refreshing={this.state.refreshing}
+            onRefresh={() => { 
+              this.setState({refreshing: true}); 
+              WebViewRef && WebViewRef.reload(); 
+              this.setState({refreshing: false});
+            }}
+          />
+        }
+      >
       <WebView 
+      ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
       style={[
         styles.container, 
         styles.vertical, 
@@ -58,13 +80,14 @@ export default class MainActivity extends Component {
       ]}
       source={{
         uri: 'https://fsostrikeball.ru?app=1',
-        headers: { "OS": Platform.OS },
+        headers: { "OS": Platform.OS }, // Можно добавить информацию о версии приложения для дальнейшей статистики
       }} 
       automaticallyAdjustContentInsets={ false }
       startInLoadingState = { true }
       renderLoading={ this.ActivityIndicatorLoadingView } 
       renderError={ this.ErrorHandlerView }
       />
+    </ScrollView>
     );
   }
 }
