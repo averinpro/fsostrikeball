@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
   WebViewStyle: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex:1
+    flex:1,
+    marginTop: Platform.OS === 'ios' ? 20 : 10
   },
 
   ActivityIndicatorStyle: {
